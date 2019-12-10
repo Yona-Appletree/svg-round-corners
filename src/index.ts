@@ -12,7 +12,7 @@
  *               the previous and next points.
  * @returns A new SVG path string with the rounding
  */
-function roundPathCorners(pathString: string, radius: number, useFractionalRadius = false) {
+export function roundPathCorners(pathString: string, radius: number, useFractionalRadius = false) {
   function moveTowardsLength(movingPoint: IPoint, targetPoint: IPoint, amount: number) {
     const width = targetPoint.x - movingPoint.x;
     const height = targetPoint.y - movingPoint.y;
@@ -32,8 +32,8 @@ function roundPathCorners(pathString: string, radius: number, useFractionalRadiu
   // Adjusts the ending position of a command
   function adjustCommand(cmd: PathCommand, newPoint: IPoint) {
     if (cmd.length > 2) {
-      cmd[cmd.length - 2] = newPoint.x.toString();
-      cmd[cmd.length - 1] = newPoint.y.toString();
+      cmd[cmd.length - 2] = newPoint.x;
+      cmd[cmd.length - 1] = newPoint.y;
     }
   }
 
@@ -62,7 +62,7 @@ function roundPathCorners(pathString: string, radius: number, useFractionalRadiu
   const commands = pathParts.reduce((result: PathCommand[], part: string) => {
     if (!isNaN(parseFloat(part)) && result.length) {
       // Push numbers to the last command, if there is one
-      result[result.length - 1].push(part);
+      (result[result.length - 1] as number[]).push(parseFloat(part));
     } else {
       // Push non-numbers as a new command
       result.push([part]);
@@ -153,7 +153,7 @@ function roundPathCorners(pathString: string, radius: number, useFractionalRadiu
     resultCommands = commands;
   }
 
-  return resultCommands.reduce((str, c) => str + c.join(' ') + ' ', '');
+  return resultCommands.map(it => it.join(' ')).join(' ');
 }
 
 type PathCommand = ([string] | [string, number?, number?, number?, number?, number?, number?]) & { origPoint?: IPoint };
